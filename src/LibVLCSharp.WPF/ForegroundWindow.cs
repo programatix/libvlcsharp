@@ -4,18 +4,23 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Linq;
+using static LibVLCSharp.WPF.User32Wrapper;
 
 namespace LibVLCSharp.WPF
 {
     internal class ForegroundWindow : Window
     {
-        Window? _wndhost;
-        readonly FrameworkElement _bckgnd;
-        readonly Point _zeroPoint = new Point(0, 0);
+        private Window? _wndhost;
+        private IntPtr _hWnd;
+        private readonly FrameworkElement _bckgnd;
+        private readonly Point _zeroPoint = new Point(0, 0);
         private readonly Grid _grid = new Grid();
 
-        UIElement? _overlayContent;
+        private UIElement? _overlayContent;
+
         internal UIElement? OverlayContent
         {
             get => _overlayContent;
@@ -50,25 +55,38 @@ namespace LibVLCSharp.WPF
             _bckgnd.Unloaded += Background_Unloaded;
         }
 
-        void Background_DataContextChanged(object? sender, DependencyPropertyChangedEventArgs e)
+        private void Background_DataContextChanged(object? sender, DependencyPropertyChangedEventArgs e)
         {
             DataContext = e.NewValue;
         }
 
-        void Background_Unloaded(object? sender, RoutedEventArgs e)
+        private void Background_Unloaded(object? sender, RoutedEventArgs e)
         {
             _bckgnd.SizeChanged -= Bckgnd_SizeChanged;
             _bckgnd.LayoutUpdated -= Bckgnd_LayoutUpdated;
             if (_wndhost != null)
             {
-                _wndhost.Closing -= Wndhost_Closing;
-                _wndhost.LocationChanged -= Wndhost_LocationChanged;
+                /*_wndhost.Closing -= Wndhost_Closing;
+                _wndhost.LocationChanged -= Wndhost_LocationChanged;*/
             }
 
             Hide();
         }
 
-        void Background_Loaded(object? sender, RoutedEventArgs e)
+        private DependencyObject GetRoot(DependencyObject obj)
+        {
+            var parent = VisualTreeHelper.GetParent(obj);
+            if (parent != null)
+            {
+                return GetRoot(parent);
+            }
+            else
+            {
+                return obj;
+            }
+        }
+
+        private void Background_Loaded(object? sender, RoutedEventArgs e)
         {
             if (_wndhost != null && IsVisible)
             {
@@ -76,16 +94,23 @@ namespace LibVLCSharp.WPF
             }
 
             _wndhost = GetWindow(_bckgnd);
-            Trace.Assert(_wndhost != null);
-            if (_wndhost == null)
+            //Trace.Assert(_wndhost != null, $"{nameof(_wndhost)} is null");
+            if (_wndhost != null)
             {
-                return;
+                Owner = _wndhost;
+            }
+            else
+            {
+                using var p = Process.GetCurrentProcess();
+                _hWnd = p.MainWindowHandle;
+                var helper = new WindowInteropHelper(this)
+                {
+                    Owner = _hWnd
+                };
             }
 
-            Owner = _wndhost;
-
-            _wndhost.Closing += Wndhost_Closing;
-            _wndhost.LocationChanged += Wndhost_LocationChanged;
+            /*_wndhost.Closing += Wndhost_Closing;
+            _wndhost.LocationChanged += Wndhost_LocationChanged;*/
             _bckgnd.LayoutUpdated += Bckgnd_LayoutUpdated;
             _bckgnd.SizeChanged += Bckgnd_SizeChanged;
 
@@ -93,7 +118,7 @@ namespace LibVLCSharp.WPF
             {
                 AlignWithBackground();
                 Show();
-                _wndhost.Focus();
+                _wndhost?.Focus();
             }
             catch (Exception ex)
             {
@@ -102,29 +127,34 @@ namespace LibVLCSharp.WPF
             }
         }
 
-        void Bckgnd_LayoutUpdated(object? sender, EventArgs e)
+        private void Bckgnd_LayoutUpdated(object? sender, EventArgs e)
         {
             AlignWithBackground();
         }
 
-        void Wndhost_LocationChanged(object? sender, EventArgs e)
+        private void Wndhost_LocationChanged(object? sender, EventArgs e)
         {
             AlignWithBackground();
         }
 
-        void Bckgnd_SizeChanged(object? sender, SizeChangedEventArgs e)
+        private void Bckgnd_SizeChanged(object? sender, SizeChangedEventArgs e)
         {
             AlignWithBackground();
         }
 
-        void AlignWithBackground()
+        private void AlignWithBackground()
         {
+            PresentationSource source;
             if (_wndhost == null)
             {
-                return;
+                var rct = new RECT();
+                GetWindowRect(_hWnd, ref rct);
+                source = new HwndSource(0, 0, 0, rct.Left, rct.Top, rct.Right - rct.Left, rct.Bottom - rct.Top, "a", IntPtr.Zero);
             }
-
-            var source = PresentationSource.FromVisual(_wndhost);
+            else
+            {
+                source = PresentationSource.FromVisual(_wndhost);
+            }
 
             if (source == null)
             {
@@ -178,7 +208,7 @@ namespace LibVLCSharp.WPF
             }
         }
 
-        void ScaleWindowContent(double scaleX, double scaleY)
+        private void ScaleWindowContent(double scaleX, double scaleY)
         {
             if (VisualChildrenCount <= 0)
             {
@@ -189,7 +219,7 @@ namespace LibVLCSharp.WPF
 
             // Do not re-create and apply the ScaleTransform if already scaled
             // That would lead to an infinite layout update cycle
-            if (child.LayoutTransform is ScaleTransform scaleTransform && 
+            if (child.LayoutTransform is ScaleTransform scaleTransform &&
                 Math.Abs(scaleTransform.ScaleX - scaleX) < 0.01 &&
                 Math.Abs(scaleTransform.ScaleY - scaleY) < 0.01)
             {
@@ -199,7 +229,7 @@ namespace LibVLCSharp.WPF
             child.LayoutTransform = new ScaleTransform(scaleX, scaleY);
         }
 
-        void Wndhost_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        private void Wndhost_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             if (e.Cancel)
             {

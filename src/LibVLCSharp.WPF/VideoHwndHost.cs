@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Automation.Provider;
 using System.Windows.Interop;
 
 namespace LibVLCSharp.WPF
@@ -18,6 +20,7 @@ namespace LibVLCSharp.WPF
                                                        User32Wrapper.Window32Styles.WS_CHILD | User32Wrapper.Window32Styles.WS_VISIBLE | User32Wrapper.Window32Styles.WS_CLIPCHILDREN, 
                                                        0, 0, 0, 0, 
                                                        hwndParent.Handle, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+
             return new HandleRef(this, windowHandle);
         }
 

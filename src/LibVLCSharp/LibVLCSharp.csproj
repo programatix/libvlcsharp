@@ -28,9 +28,7 @@ This package also contains the views for the following platforms:
 If you need Xamarin.Forms support, see LibVLCSharp.Forms. 
 
 LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.</Description>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;netstandard1.1;net40;net471;net8.0;net6.0</TargetFrameworks>
-    <TargetFrameworks Condition="!$([MSBuild]::IsOsPlatform('Linux'))">$(TargetFrameworks);net8.0-android;net8.0-ios;net8.0-macos;net8.0-tvos</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(TargetFrameworks);uap10.0.18362;net6.0-windows10.0.17763.0;net8.0-windows10.0.19041;monoandroid81;xamarin.ios10;xamarin.mac20</TargetFrameworks>
+    <TargetFrameworks>net471</TargetFrameworks>
     <Configurations>Debug;Release;Win32Debug;Win32Release</Configurations>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeAWindow</TargetsForTfmSpecificBuildOutput>
     <RootNamespace>LibVLCSharp</RootNamespace>
@@ -40,13 +38,6 @@ LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.</Descri
    <RuntimeIdentifiers Condition="$(TargetFramework.Contains('net8.0-windows10'))">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
   </PropertyGroup>
   <!--Override TFMs when building from the LVS.Win32 solution-->
-  <PropertyGroup Condition="$(Configuration.StartsWith('Win32'))">
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net6.0;net6.0-windows</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('uap'))">
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Platforms\**\*.cs" />
     <None Include="Platforms\**\*.cs" />

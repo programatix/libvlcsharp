@@ -11,7 +11,7 @@ in a WPF app. It depends on LibVLCSharp.
 
 LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.
     </Description> 
-    <TargetFrameworks>net461;netcoreapp3.1;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net480;</TargetFrameworks>
     <Configurations>Debug;Release;Win32Debug;Win32Release</Configurations>
     <RootNamespace>LibVLCSharp.WPF</RootNamespace>
     <PackageId>LibVLCSharp.WPF</PackageId>
@@ -19,9 +19,6 @@ LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.
     <PackageTags>$(PackageTags);wpf</PackageTags>
   </PropertyGroup>
   <!--Override TFMs when building from the LVS.Win32 solution-->
-  <PropertyGroup Condition="$(Configuration.StartsWith('Win32'))">
-    <TargetFrameworks>netcoreapp3.1;net6.0-windows</TargetFrameworks>
-  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibVLCSharp\LibVLCSharp.csproj" />
   </ItemGroup>

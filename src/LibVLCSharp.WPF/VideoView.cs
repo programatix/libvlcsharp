@@ -83,7 +83,6 @@ namespace LibVLCSharp.WPF
                 OverlayContent = ViewContent
             };
 
-
             if (_videoHwndHost.Handle == IntPtr.Zero)
             {
                 Trace.WriteLine("HWND is NULL, aborting...");
@@ -147,7 +146,8 @@ namespace LibVLCSharp.WPF
 
         #region IDisposable Support
 
-        bool disposedValue;
+        private bool disposedValue;
+
         /// <summary>
         /// Unhook mediaplayer and dispose foreground window
         /// </summary>
@@ -182,6 +182,6 @@ namespace LibVLCSharp.WPF
             Dispose(true);
         }
 
-        #endregion
+        #endregion IDisposable Support
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace LibVLCSharp.WPF
 {
@@ -44,6 +45,14 @@ namespace LibVLCSharp.WPF
             WS_CLIPCHILDREN = 0x02000000
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
 
         [DllImport(LibraryName)]
         internal static extern IntPtr CreateWindowEx(ExtendedWindow32Styles dwExStyle,
@@ -56,8 +65,11 @@ namespace LibVLCSharp.WPF
                 IntPtr hInst,
                 IntPtr lpParam);
 
-
         [DllImport(LibraryName)]
         internal static extern bool DestroyWindow(IntPtr hwnd);
+
+        [DllImport(LibraryName, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
     }
 }
