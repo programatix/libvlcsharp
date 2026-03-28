@@ -35,7 +35,9 @@ LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.</Descri
     <PackageId>LibVLCSharp</PackageId>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableDefaultPageItems>false</EnableDefaultPageItems>
-   <RuntimeIdentifiers Condition="$(TargetFramework.Contains('net8.0-windows10'))">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers Condition="$(TargetFramework.Contains('-windows10'))">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <!-- https://github.com/novotnyllc/MSBuildSdkExtras/issues/305 -->
+    <TargetFrameworkIdentifier Condition=" $([MSBuild]::GetTargetFrameworkIdentifier('$(TargetFramework)')) == '.NETCoreApp' ">.NETCoreApp</TargetFrameworkIdentifier>
   </PropertyGroup>
   <!--Override TFMs when building from the LVS.Win32 solution-->
   <ItemGroup>
@@ -75,7 +77,7 @@ LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.</Descri
   </ItemGroup>
   
   <ItemGroup Condition="$(TargetFramework.Contains('windows10')) ">
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('UWP'))">

@@ -379,6 +379,9 @@ namespace LibVLCSharp.Shared
                 _gcHandle.Free();
                 _exitCallback = null;
                 _log = null;
+#if DESKTOP
+                CloseLogFile();
+#endif
             }
 
             base.Dispose(disposing);
@@ -496,7 +499,9 @@ namespace LibVLCSharp.Shared
         {
             if (_logFileHandle == IntPtr.Zero) return true;
 
-            return MarshalUtils.Close(_logFileHandle);
+            var result = MarshalUtils.Close(_logFileHandle);
+            _logFileHandle = IntPtr.Zero;
+            return result;
         }
 
         /// <summary>Sets up logging to a file.
@@ -506,7 +511,11 @@ namespace LibVLCSharp.Shared
         /// <para>FILE pointer opened for writing</para>
         /// <para>(the FILE pointer must remain valid until libvlc_log_unset())</para>
         /// <param name="filename">open/create file with Write access. If existing, resets content.</param>
-        /// <remarks>LibVLC 2.1.0 or later</remarks>
+        /// <remarks>
+        /// <para>LibVLC 2.1.0 or later</para>
+        /// <para>Call CloseLogFile() to finalize writing logs to disk and release the native file handle.</para>
+        /// <para>In any case, the file handle will be automatically closed when the LibVLC instance is disposed.</para>
+        /// </remarks>
         public void SetLogFile(string filename)
         {
             if (string.IsNullOrEmpty(filename)) throw new NullReferenceException(nameof(filename));

@@ -1,4 +1,15 @@
 ﻿<Project>
+  <!-- Redirect to VS2022 for legacy Xamarin TFMs (VS2026+ compatibility) -->
+  <PropertyGroup Condition="$([MSBuild]::IsOsPlatform('Windows')) And ($(TargetFramework.Contains('monoandroid')) Or $(TargetFramework.Contains('xamarin')))">
+    <VS2022Edition Condition="Exists('C:\Program Files\Microsoft Visual Studio\2022\Enterprise')">Enterprise</VS2022Edition>
+    <VS2022Edition Condition="'$(VS2022Edition)' == '' And Exists('C:\Program Files\Microsoft Visual Studio\2022\Professional')">Professional</VS2022Edition>
+    <VS2022Edition Condition="'$(VS2022Edition)' == '' And Exists('C:\Program Files\Microsoft Visual Studio\2022\Community')">Community</VS2022Edition>
+    <VS2022Root>C:\Program Files\Microsoft Visual Studio\2022\$(VS2022Edition)</VS2022Root>
+    <MSBuildExtensionsPath>$(VS2022Root)\MSBuild</MSBuildExtensionsPath>
+    <VsInstallRoot>$(VS2022Root)</VsInstallRoot>
+    <TargetFrameworkRootPath>$(VS2022Root)\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\</TargetFrameworkRootPath>
+  </PropertyGroup>
+
   <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
     <DefineConstants>$(DefineConstants);IOS;APPLE</DefineConstants>
   </PropertyGroup>
@@ -44,7 +55,7 @@
     <RepositoryUrl>https://code.videolan.org/videolan/LibVLCSharp</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReleaseNotes>https://code.videolan.org/videolan/LibVLCSharp/blob/master/NEWS</PackageReleaseNotes>
-    <VersionPrefix>3.9.4</VersionPrefix>
+    <VersionPrefix>3.9.6</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageTags>libvlc;vlc;videolan;native;c/c++;video;audio;player;media;mediaplayer;codec;ffmpeg;xamarin;graphics;ios;android;linux;windows;macos;cross-platform</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -56,6 +67,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="README.md" Pack="true" PackagePath="\"/>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
