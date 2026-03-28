@@ -169,7 +169,7 @@ namespace LibVLCSharp.Shared.Helpers
             return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
         }
 
- #if !APPLE && !ANDROID && !NETSTANDARD2_1 && !NET40
+#if !APPLE && !ANDROID && !NETSTANDARD2_1 && !NET40 && !NET48
         /// <summary>
         /// The Span-based APIs on Stream are not available on older targets. Span can be backported on older TFMs through the System.Memory package,
         /// but System.IO does not provide the same benefit. This code is extracted from dotnet/runtime to allow efficient media callbacks implementation.

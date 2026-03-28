@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-#if !APPLE && !ANDROID && !NETSTANDARD2_1 && !NET40
+#if !APPLE && !ANDROID && !NETSTANDARD2_1 && !NET40 && !NET48
  using LibVLCSharp.Shared.Helpers;
 #endif
 
@@ -13,7 +13,7 @@ namespace LibVLCSharp.Shared
     public class StreamMediaInput : MediaInput
     {
         private readonly Stream _stream;
-#if NET40
+#if NET40 || NET48
         private readonly byte[] _readBuffer = new byte[0x4000];
 #endif
         /// <summary>
@@ -75,7 +75,7 @@ namespace LibVLCSharp.Shared
                     if (_stream.Position == _stream.Length)
                         return 0;
                 }
-#if NET40
+#if NET40 || NET48
                 var read = _stream.Read(_readBuffer, 0, Math.Min((int)len, _readBuffer.Length));
                 Marshal.Copy(_readBuffer, 0, buf, read);
                 return read;

@@ -28,7 +28,7 @@ This package also contains the views for the following platforms:
 If you need Xamarin.Forms support, see LibVLCSharp.Forms. 
 
 LibVLC needs to be installed separately, see VideoLAN.LibVLC.* packages.</Description>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
     <Configurations>Debug;Release;Win32Debug;Win32Release</Configurations>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeAWindow</TargetsForTfmSpecificBuildOutput>
     <RootNamespace>LibVLCSharp</RootNamespace>
